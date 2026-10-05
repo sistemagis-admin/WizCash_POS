@@ -13,10 +13,12 @@ async function runInit() {
     const sql = fs.readFileSync(sqlPath, 'utf8');
 
     await pool.query(sql);
-    console.log('Database initialized successfully!');
+    console.log('✅ Database initialized successfully!');
+    await pool.end();
     process.exit(0);
   } catch (error: any) {
-    console.error('Database initialization failed:', error.message);
+    console.error('❌ Database initialization failed:', error?.message || error);
+    await pool.end().catch(() => {});
     process.exit(1);
   }
 }

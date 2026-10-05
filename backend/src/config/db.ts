@@ -1,16 +1,27 @@
 import { Pool, QueryResult, QueryResultRow } from 'pg';
 import { config } from './env.js';
 
-export const pool = new Pool({
-  host: config.db.host,
-  port: config.db.port,
-  user: config.db.user,
-  password: config.db.password,
-  database: config.db.database,
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 5000,
-});
+const poolConfig = config.db.url
+  ? {
+      connectionString: config.db.url,
+      ssl: { rejectUnauthorized: false },
+      max: 20,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 10000,
+    }
+  : {
+      host: config.db.host,
+      port: config.db.port,
+      user: config.db.user,
+      password: config.db.password,
+      database: config.db.database,
+      ssl: config.db.ssl ? { rejectUnauthorized: false } : undefined,
+      max: 20,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 5000,
+    };
+
+export const pool = new Pool(poolConfig);
 
 pool.on('error', (err) => {
   console.error('[DB Error] Unexpected error on idle client:', err.message);
@@ -38,7 +49,7 @@ export const testDbConnection = async (): Promise<boolean> => {
     console.log(`Server Time: ${result.rows[0].current_time}`);
     return true;
   } catch (error: any) {
-    console.error('PostgreSQL Connection failed:', error.message);
+    console.error('PostgreSQL Connection failed:', error?.message || error);
     return false;
   }
 };
