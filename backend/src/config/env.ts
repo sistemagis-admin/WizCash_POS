@@ -8,6 +8,7 @@ export const config = {
   port: parseInt(process.env.PORT || '5000', 10),
   nodeEnv: process.env.NODE_ENV || 'development',
   corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:4200',
+  jwtSecret: process.env.JWT_SECRET || 'wizcash_super_secret_jwt_key_2026',
   db: {
     url: process.env.DATABASE_URL || '',
     host: process.env.DB_HOST || 'localhost',
